@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxLink - SIM-Free Messaging</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Landing Page Styles */
+        .landing-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 20px 50px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 30px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* App Styles */
+        .app-container {
+            display: none;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        #loginScreen {
+            display: none;
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            background: white;
+            color: #2563eb;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px auto;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+        }
+
+        /* Chat Styles */
+        .header-app {
+            background: #2563eb;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .chat-container {
+            margin: 80px 0 70px;
+            padding: 15px;
+            min-height: calc(100vh - 150px);
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 12px 16px;
+            margin: 8px 0;
+            border-radius: 18px;
+            clear: both;
+            animation: fadeIn 0.3s;
+            word-wrap: break-word;
+        }
+
+        .received {
+            background: white;
+            float: left;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .sent {
+            background: #2563eb;
+            color: white;
+            float: right;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
+        }
+
+        .input-container {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: white;
+            padding: 10px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            box-sizing: border-box;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        #sendButton {
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: white;
+            padding: 12px 0;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-btn.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landingPage" class="landing-page">
+        <header class="header">
+            <div class="logo">🚀</div>
+            <h1 class="title">VoxLink</h1>
+            <p class="subtitle">SIM-Free Messaging • Connect Without Limits</p>
+            <button class="cta-button" onclick="openApp()">🚀 Launch VoxLink App</button>
+            
+            <div style="margin-top: 50px; font-size: 1.1rem; opacity: 0.9;">
+                <p>📹 Reels System • 🔴 Live Streaming • 👥 Communities • 🛡️ Safety Features</p>
+                <p>💰 Ethical Ads • 🌍 Religion Respect • 🎨 Creator Tools</p>
+            </div>
+        </header>
+    </div>
+
+    <!-- VoxLink App -->
+    <div id="appContainer" class="app-container">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen">
+            <div style="text-align: center; padding: 50px 20px;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 10px;">🚀 VoxLink</h1>
+                <p style="margin-bottom: 30px; opacity: 0.9;">SIM-Free Messaging</p>
+                
+                <div class="login-box">
+                    <h2>Welcome to VoxLink!</h2>
+                    <input type="text" id="username" placeholder="Choose your username">
+                    <input type="password" id="password" placeholder="Create password">
+                    <button class="cta-button" onclick="login()" style="width: 100%; margin-top: 20px;">
+                        Start Chatting ✅
+                    </button>
+                    <p style="font-size: 12px; color: #64748b; margin-top: 15px;">
+                        No SIM needed • No phone number • Pure internet messaging
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Screen -->
+        <div id="chatScreen" class="screen">
+            <div class="header-app">
+                <h2>VoxLink Chat</h2>
+                <p>Connected as: <span id="currentUser">User</span></p>
+            </div>
+            
+            <div class="chat-container" id="chatContainer">
+                <div class="message received">
+                    👋 Welcome to VoxLink! Start chatting...
+                </div>
+                <div class="message sent">
+                    Hello! This is SIM-free messaging! 🚀
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <input type="text" id="messageInput" placeholder="Type your message...">
+                <button id="sendButton" onclick="sendMessage()">➤</button>
+            </div>
+            
+            <div class="nav">
+                <button class="nav-btn active" onclick="showScreen('chatScreen')">
+                    <span class="nav-icon">💬</span>
+                    Chat
+                </button>
+                <button class="nav-btn" onclick="showScreen('profileScreen')">
+                    <span class="nav-icon">👤</span>
+                    Profile
+                </button>
+                <button class="nav-btn" onclick="logout()">
+                    <span class="nav-icon">🚪</span>
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Profile Screen -->
+        <div id="profileScreen" class="screen">
+            <div class="header-app">
+                <h2>My Profile</h2>
+            </div>
+            
+            <div style="background: white; margin: 80px auto 20px; padding: 30px; border-radius: 20px; max-width: 400px; text-align: center;">
+                <div style="width: 80px; height: 80px; background: #2563eb; border-radius: 50%; margin: 0 auto 20px; color: white; font-size: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;" id="userAvatar">U</div>
+                <h2 id="profileUsername">Username</h2>
+                <p style="color: #64748b;">VoxLink User • SIM-Free Member</p>
+                
+                <div style="margin-top: 30px; text-align: left;">
+                    <h3>🎯 Your VoxLink Features:</h3>
+                    <p>✅ SIM-Free Messaging</p>
+                    <p>✅ Real-Time Chat</p>
+                    <p>✅ Coming Soon: Reels System</p>
+                    <p>✅ Coming Soon: Live Streaming</p>
+                    <p>✅ Coming Soon: Communities</p>
+                </div>
+                
+                <button onclick="showScreen('chatScreen')" style="background: #10b981; color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; width: 100%; margin-top: 20px;">
+                    💬 Back to Chat
+                </button>
+            </div>
+            
+            <div class="nav">
+                <button class="nav-btn" onclick="showScreen('chatScreen')">
+                    <span class="nav-icon">💬</span>
+                    Chat
+                </button>
+                <button class="nav-btn active" onclick="showScreen('profileScreen')">
+                    <span class="nav-icon">👤</span>
+                    Profile
+                </button>
+                <button class="nav-btn" onclick="logout()">
+                    <span class="nav-icon">🚪</span>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // SIMPLE WORKING FUNCTIONS
+        function openApp() {
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('loginScreen').style.display = 'block';
+        }
+        
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username && password) {
+                document.getElementById('currentUser').textContent = username;
+                document.getElementById('profileUsername').textContent = username;
+                document.getElementById('userAvatar').textContent = username.charAt(0).toUpperCase();
+                
+                showScreen('chatScreen');
+                
+                setTimeout(() => {
+                    const welcomeMsg = document.createElement('div');
+                    welcomeMsg.className = 'message received';
+                    welcomeMsg.textContent = `Welcome ${username}! You're now connected SIM-free! 🌍`;
+                    document.getElementById('chatContainer').appendChild(welcomeMsg);
+                }, 500);
+            } else {
+                alert('Please enter username and password!');
+            }
+        }
+        
+        function showScreen(screenName) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.style.display = 'none';
+            });
+            document.getElementById(screenName).style.display = 'block';
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (screenName === 'chatScreen') {
+                document.querySelectorAll('.nav-btn')[0].classList.add('active');
+            } else if (screenName === 'profileScreen') {
+                document.querySelectorAll('.nav-btn')[1].classList.add('active');
+            }
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message sent';
+                messageDiv.textContent = message;
+                document.getElementById('chatContainer').appendChild(messageDiv);
+                
+                input.value = '';
+                
+                setTimeout(() => {
+                    const replies = [
+                        "Nice message! 📱",
+                        "VoxLink is working! 🚀",
+                        "SIM-free messaging is awesome! 🌍",
+                        "This is so smooth! 💫"
+                    ];
+                    const reply = replies[Math.floor(Math.random() * replies.length)];
+                    
+                    const replyDiv = document.createElement('div');
+                    replyDiv.className = 'message received';
+                    replyDiv.textContent = reply;
+                    document.getElementById('chatContainer').appendChild(replyDiv);
+                }, 1000);
+            }
+        }
+        
+        function logout() {
+            if (confirm('Return to homepage?')) {
+                document.getElementById('appContainer').style.display = 'none';
+                document.getElementById('landingPage').style.display = 'block';
+            }
+        }
+
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+  </html>
